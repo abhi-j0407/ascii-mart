@@ -247,7 +247,7 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 - [x] Phase 4 — Upload pipeline + Web Worker
 - [x] Phase 5 — Canvas renderer + 4 static states
 - [x] Phase 6 — Animation engine
-- [ ] Phase 7 — Export
+- [x] Phase 7 — Export
 - [ ] Phase 8 — Auto-demo, responsive, perf safeguards & UI polish
 - [ ] Phase 9 — Deploy & QA
 
@@ -263,3 +263,4 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 2026-05-26 — phase-4-upload-worker — PR #4 — Upload pipeline, worker compute, density recompute, static preview
 2026-05-26 — phase-5-renderer — PR #5 — DPR canvas renderer, 4 static states, AsciiCanvas replaces preview
 2026-05-26 — phase-6-animation — PR #6 — rAF timeline, seeded reveals, auto-play/replay/speed, scrub to static
+2026-05-26 — phase-7-export — PR #7 — High-DPI PNG + .txt export, background toggle, downloadState wired
