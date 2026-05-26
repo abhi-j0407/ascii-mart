@@ -241,7 +241,7 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 
 ## 8. Status
 
-- [ ] Phase 1 — Scaffold & app shell
+- [x] Phase 1 — Scaffold & app shell
 - [ ] Phase 2 — Core ASCII engine: shape-based mono fill
 - [ ] Phase 3 — Edge pass + color → complete cell model
 - [ ] Phase 4 — Upload pipeline + Web Worker
@@ -257,4 +257,4 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 
 > The orchestrator appends a one-line entry per merged phase (date, branch, PR link, one-line outcome). Newest last.
 
-_(empty)_
+2026-05-26 — phase-1-scaffold — PR #1 — Next.js scaffold, gallery shell, Zustand store, inert controls
