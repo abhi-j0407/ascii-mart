@@ -13,6 +13,8 @@ export interface AppState {
   density: number;
   speed: number;
   playbackStatus: PlaybackStatus;
+  /** Incremented when a new playback run starts (upload or replay). */
+  playbackEpoch: number;
   uploadError: string | null;
 }
 

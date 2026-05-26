@@ -19,6 +19,21 @@ import {
 
 const noop = () => undefined;
 
+function beginPlayback(
+  set: (partial: Partial<AppStore>) => void,
+  get: () => AppStore,
+): void {
+  const { cellModel, sourceImage } = get();
+  if (!cellModel || !sourceImage) {
+    return;
+  }
+  set({
+    playbackStatus: "playing",
+    playbackEpoch: get().playbackEpoch + 1,
+    currentState: "dot-grid",
+  });
+}
+
 export const useAppStore = create<AppStore>((set, get) => ({
   sourceImage: null,
   cellModel: null,
@@ -26,9 +41,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
   density: DEFAULT_DENSITY,
   speed: DEFAULT_SPEED,
   playbackStatus: "idle",
+  playbackEpoch: 0,
   uploadError: null,
 
-  setCurrentState: (state: CanonicalState) => set({ currentState: state }),
+  setCurrentState: (state: CanonicalState) =>
+    set({ currentState: state, playbackStatus: "idle" }),
 
   setDensity: (density: number) => {
     set({ density });
@@ -37,7 +54,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   setSpeed: (speed: number) => set({ speed }),
 
-  replay: noop,
+  replay: () => beginPlayback(set, get),
 
   processFile: async (file: File) => {
     const density = get().density;
@@ -49,9 +66,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const cellModel = await computeCellModelInWorker(imageData, { density });
       set({
         cellModel,
-        playbackStatus: "idle",
         uploadError: null,
-        currentState: "mono",
+        currentState: "dot-grid",
+        playbackStatus: "playing",
+        playbackEpoch: get().playbackEpoch + 1,
       });
     } catch (error) {
       if (error instanceof EngineWorkerAbortedError) {
