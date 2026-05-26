@@ -2,6 +2,7 @@ import {
   EngineWorkerAbortedError,
   computeCellModelInWorker,
 } from "@/lib/engine/client";
+import { resolveComputeDensity } from "@/lib/perf/resolveDensity";
 import { rasterizeForEngine } from "@/lib/upload/rasterize";
 import { UploadValidationError } from "@/lib/upload/validate";
 
@@ -39,13 +40,20 @@ export async function recomputeCellModel(
   set({ playbackStatus: "processing", uploadError: null });
 
   try {
-    const imageData = rasterizeForEngine(
-      sourceImage,
+    const effectiveDensity = resolveComputeDensity(
       sourceImage.naturalWidth,
       sourceImage.naturalHeight,
       density,
     );
-    const cellModel = await computeCellModelInWorker(imageData, { density });
+    const imageData = rasterizeForEngine(
+      sourceImage,
+      sourceImage.naturalWidth,
+      sourceImage.naturalHeight,
+      effectiveDensity,
+    );
+    const cellModel = await computeCellModelInWorker(imageData, {
+      density: effectiveDensity,
+    });
     set({ cellModel, playbackStatus: "idle", uploadError: null });
   } catch (error) {
     if (error instanceof EngineWorkerAbortedError) {
