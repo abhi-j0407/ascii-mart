@@ -244,7 +244,7 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 - [x] Phase 1 — Scaffold & app shell
 - [x] Phase 2 — Core ASCII engine: shape-based mono fill
 - [x] Phase 3 — Edge pass + color → complete cell model
-- [ ] Phase 4 — Upload pipeline + Web Worker
+- [x] Phase 4 — Upload pipeline + Web Worker
 - [ ] Phase 5 — Canvas renderer + 4 static states
 - [ ] Phase 6 — Animation engine
 - [ ] Phase 7 — Export
@@ -260,3 +260,4 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 2026-05-26 — phase-1-scaffold — PR #1 — Next.js scaffold, gallery shell, Zustand store, inert controls
 2026-05-26 — phase-2-ascii-engine — PR #2 — Shape-based mono fill engine (6D vectors, k-d tree, cache, 21 tests)
 2026-05-26 — phase-3-cell-model — PR #3 — DoG+Sobel edges, per-cell color, buildCellModel, store CellModel wired
+2026-05-26 — phase-4-upload-worker — PR #4 — Upload pipeline, worker compute, density recompute, static preview
