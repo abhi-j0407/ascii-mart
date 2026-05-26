@@ -13,6 +13,7 @@ export interface AppState {
   density: number;
   speed: number;
   playbackStatus: PlaybackStatus;
+  uploadError: string | null;
 }
 
 export interface AppActions {
@@ -20,7 +21,8 @@ export interface AppActions {
   setDensity: (density: number) => void;
   setSpeed: (speed: number) => void;
   replay: () => void;
-  uploadImage: () => void;
+  processFile: (file: File) => Promise<void>;
+  clearUploadError: () => void;
   downloadState: () => void;
 }
 

@@ -2,6 +2,7 @@
 
 import { CanvasPlaceholder } from "@/components/CanvasPlaceholder";
 import { ControlBar } from "@/components/ControlBar";
+import { UploadTarget } from "@/components/UploadTarget";
 
 export function AppShell() {
   return (
@@ -9,9 +10,11 @@ export function AppShell() {
       <main className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-4 md:px-8 md:py-6">
         <div className="flex h-full w-full max-w-5xl flex-col">
           <div className="flex min-h-0 flex-1 items-center justify-center">
-            <div className="relative aspect-[4/3] w-full max-h-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm ring-1 ring-black/5">
-              <CanvasPlaceholder />
-            </div>
+            <UploadTarget>
+              <div className="relative aspect-[4/3] w-full max-h-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm ring-1 ring-black/5">
+                <CanvasPlaceholder />
+              </div>
+            </UploadTarget>
           </div>
         </div>
       </main>
