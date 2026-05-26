@@ -21,9 +21,16 @@ export function ControlBar() {
   const setCurrentState = useAppStore((state) => state.setCurrentState);
   const setDensity = useAppStore((state) => state.setDensity);
   const setSpeed = useAppStore((state) => state.setSpeed);
+  const cellModel = useAppStore((state) => state.cellModel);
+  const sourceImage = useAppStore((state) => state.sourceImage);
   const replay = useAppStore((state) => state.replay);
   const playbackStatus = useAppStore((state) => state.playbackStatus);
   const downloadState = useAppStore((state) => state.downloadState);
+
+  const canReplay =
+    cellModel !== null &&
+    sourceImage !== null &&
+    playbackStatus !== "processing";
 
   const controls = (
     <>
@@ -96,7 +103,8 @@ export function ControlBar() {
       <button
         type="button"
         onClick={replay}
-        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-neutral-300 bg-white px-3 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400"
+        disabled={!canReplay}
+        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-neutral-300 bg-white px-3 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Replay
       </button>

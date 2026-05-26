@@ -2,6 +2,12 @@
 
 import { useEffect, useRef } from "react";
 
+import {
+  buildCellRevealOrders,
+  timelineAtElapsed,
+  type CellRevealOrders,
+} from "@/lib/animation";
+import { renderAnimatedFrame } from "@/lib/render/animatedRenderer";
 import { renderFrame } from "@/lib/render/canvasRenderer";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -39,11 +45,17 @@ function drawEmptyPlaceholder(
 
 export function AsciiCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ordersRef = useRef<CellRevealOrders | null>(null);
 
   const cellModel = useAppStore((state) => state.cellModel);
   const currentState = useAppStore((state) => state.currentState);
   const sourceImage = useAppStore((state) => state.sourceImage);
   const playbackStatus = useAppStore((state) => state.playbackStatus);
+  const playbackEpoch = useAppStore((state) => state.playbackEpoch);
+
+  useEffect(() => {
+    ordersRef.current = cellModel ? buildCellRevealOrders(cellModel) : null;
+  }, [cellModel]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,7 +64,9 @@ export function AsciiCanvas() {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    const draw = () => {
+    let rafId = 0;
+
+    const syncCanvasSize = (): { width: number; height: number } => {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       const width = Math.max(1, Math.floor(rect.width * dpr));
@@ -64,29 +78,104 @@ export function AsciiCanvas() {
       }
 
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { width: rect.width, height: rect.height };
+    };
 
-      const viewport = { width: rect.width, height: rect.height };
+    const drawStatic = (viewport: { width: number; height: number }) => {
       const hasContent =
         cellModel !== null || (currentState === "real" && sourceImage !== null);
 
-      if (hasContent) {
-        renderFrame(context, viewport, {
-          cellModel,
-          state: currentState,
-          sourceImage,
-        });
+      if (!hasContent) {
+        drawEmptyPlaceholder(context, viewport.width, viewport.height);
         return;
       }
 
-      drawEmptyPlaceholder(context, rect.width, rect.height);
+      renderFrame(context, viewport, {
+        cellModel,
+        state: currentState,
+        sourceImage,
+      });
     };
 
-    draw();
+    const draw = () => {
+      const viewport = syncCanvasSize();
+      drawStatic(viewport);
+    };
 
-    const observer = new ResizeObserver(draw);
+    const stopAnimation = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    };
+
+    const startAnimation = () => {
+      if (!cellModel || !sourceImage) return;
+
+      const orders =
+        ordersRef.current ?? buildCellRevealOrders(cellModel);
+      ordersRef.current = orders;
+
+      const animStart = performance.now();
+
+      const tick = (now: number) => {
+        const viewport = syncCanvasSize();
+        const elapsed = now - animStart;
+        const liveSpeed = useAppStore.getState().speed;
+        const snapshot = timelineAtElapsed(elapsed, liveSpeed);
+
+        renderAnimatedFrame(context, viewport, {
+          cellModel,
+          sourceImage,
+          orders,
+          snapshot,
+        });
+
+        if (snapshot.complete) {
+          useAppStore.setState({
+            playbackStatus: "idle",
+            currentState: "real",
+          });
+          stopAnimation();
+          return;
+        }
+
+        rafId = requestAnimationFrame(tick);
+      };
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    if (
+      playbackStatus === "playing" &&
+      cellModel &&
+      sourceImage
+    ) {
+      stopAnimation();
+      startAnimation();
+    } else {
+      stopAnimation();
+      draw();
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (playbackStatus !== "playing") {
+        draw();
+      }
+    });
     observer.observe(canvas);
-    return () => observer.disconnect();
-  }, [cellModel, currentState, sourceImage]);
+
+    return () => {
+      stopAnimation();
+      observer.disconnect();
+    };
+  }, [
+    cellModel,
+    currentState,
+    sourceImage,
+    playbackStatus,
+    playbackEpoch,
+  ]);
 
   const processing = playbackStatus === "processing";
 
