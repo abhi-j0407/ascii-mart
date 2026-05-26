@@ -1,11 +1,10 @@
+import type { CellModel } from "@/lib/engine";
+
+export type { CellModel };
+
 export type CanonicalState = "dot-grid" | "mono" | "color" | "real";
 
 export type PlaybackStatus = "idle" | "playing" | "processing";
-
-/** Populated by the engine in Phase 3+. */
-export interface CellModel {
-  readonly _phase3?: never;
-}
 
 export interface AppState {
   sourceImage: HTMLImageElement | null;

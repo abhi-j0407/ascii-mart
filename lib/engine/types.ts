@@ -1,3 +1,4 @@
+import type { RgbColor } from "./color";
 import type { ShapeLookup } from "./lookup";
 
 /** Six-component shape / sampling vector (staggered 3×2 circles). */
@@ -53,4 +54,31 @@ export interface MonoFillResult {
   readonly rows: number;
   /** Row-major glyph grid [row][col]. */
   readonly grid: readonly (readonly string[])[];
+}
+
+export interface Cell {
+  readonly char: string;
+  readonly color: RgbColor;
+  readonly isEdge: boolean;
+}
+
+export interface CellModel {
+  readonly cols: number;
+  readonly rows: number;
+  readonly cellWidth: number;
+  readonly cellHeight: number;
+  /** Row-major cells [row][col]. */
+  readonly cells: readonly (readonly Cell[])[];
+}
+
+export interface BuildCellModelOptions extends MonoFillOptions {
+  /** DoG small sigma. */
+  readonly dogSigmaSmall?: number;
+  /** DoG large sigma. */
+  readonly dogSigmaLarge?: number;
+  /**
+   * Edge strength threshold on normalized magnitudes (0–1).
+   * Cells whose peak edge magnitude meets or exceed this override fill glyphs.
+   */
+  readonly edgeThreshold?: number;
 }

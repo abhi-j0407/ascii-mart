@@ -28,3 +28,10 @@ export const CACHE_QUANTIZE_RANGE = 8;
 export const GLYPH_RENDER_SCALE = 8;
 export const GLYPH_CELL_WIDTH = 10;
 export const GLYPH_CELL_HEIGHT = 20;
+
+/** DoG prefilter sigmas (image pixels). */
+export const DEFAULT_DOG_SIGMA_SMALL = 1;
+export const DEFAULT_DOG_SIGMA_LARGE = 2;
+
+/** Min cell max-edge strength (0–1 after normalization) to override fill. */
+export const DEFAULT_EDGE_THRESHOLD = 0.15;
