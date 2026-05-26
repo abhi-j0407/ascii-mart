@@ -2,8 +2,16 @@
 
 import { useEffect, useRef } from "react";
 
+import { drawStaticPreview } from "@/lib/render/drawStaticPreview";
+import { useAppStore } from "@/store/useAppStore";
+
 export function CanvasPlaceholder() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const cellModel = useAppStore((state) => state.cellModel);
+  const currentState = useAppStore((state) => state.currentState);
+  const sourceImage = useAppStore((state) => state.sourceImage);
+  const playbackStatus = useAppStore((state) => state.playbackStatus);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,8 +32,20 @@ export function CanvasPlaceholder() {
       }
 
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      context.clearRect(0, 0, rect.width, rect.height);
 
+      if (cellModel) {
+        drawStaticPreview(
+          context,
+          rect.width,
+          rect.height,
+          cellModel,
+          currentState,
+          sourceImage,
+        );
+        return;
+      }
+
+      context.clearRect(0, 0, rect.width, rect.height);
       context.fillStyle = "#fafafa";
       context.fillRect(0, 0, rect.width, rect.height);
 
@@ -49,7 +69,7 @@ export function CanvasPlaceholder() {
       context.font = "13px var(--font-geist-sans, system-ui, sans-serif)";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText("Canvas preview", rect.width / 2, rect.height / 2);
+      context.fillText("Upload an image to begin", rect.width / 2, rect.height / 2);
     };
 
     draw();
@@ -57,7 +77,9 @@ export function CanvasPlaceholder() {
     const observer = new ResizeObserver(draw);
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, []);
+  }, [cellModel, currentState, sourceImage]);
+
+  const processing = playbackStatus === "processing";
 
   return (
     <div className="relative flex h-full w-full items-center justify-center">
@@ -66,6 +88,17 @@ export function CanvasPlaceholder() {
         aria-label="ASCII canvas preview"
         className="h-full w-full rounded-sm bg-neutral-50"
       />
+      {processing ? (
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/70"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="rounded-md border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-800 shadow-sm">
+            Processing…
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

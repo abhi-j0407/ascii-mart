@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { openUploadPicker } from "@/lib/upload/picker";
 import { CANONICAL_STATES } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -21,15 +22,16 @@ export function ControlBar() {
   const setDensity = useAppStore((state) => state.setDensity);
   const setSpeed = useAppStore((state) => state.setSpeed);
   const replay = useAppStore((state) => state.replay);
-  const uploadImage = useAppStore((state) => state.uploadImage);
+  const playbackStatus = useAppStore((state) => state.playbackStatus);
   const downloadState = useAppStore((state) => state.downloadState);
 
   const controls = (
     <>
       <button
         type="button"
-        onClick={uploadImage}
-        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400"
+        onClick={openUploadPicker}
+        disabled={playbackStatus === "processing"}
+        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-neutral-300 bg-white px-4 text-sm font-medium text-neutral-800 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Upload image
       </button>
