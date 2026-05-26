@@ -245,7 +245,7 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 - [x] Phase 2 — Core ASCII engine: shape-based mono fill
 - [x] Phase 3 — Edge pass + color → complete cell model
 - [x] Phase 4 — Upload pipeline + Web Worker
-- [ ] Phase 5 — Canvas renderer + 4 static states
+- [x] Phase 5 — Canvas renderer + 4 static states
 - [ ] Phase 6 — Animation engine
 - [ ] Phase 7 — Export
 - [ ] Phase 8 — Auto-demo, responsive, perf safeguards & UI polish
@@ -261,3 +261,4 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 2026-05-26 — phase-2-ascii-engine — PR #2 — Shape-based mono fill engine (6D vectors, k-d tree, cache, 21 tests)
 2026-05-26 — phase-3-cell-model — PR #3 — DoG+Sobel edges, per-cell color, buildCellModel, store CellModel wired
 2026-05-26 — phase-4-upload-worker — PR #4 — Upload pipeline, worker compute, density recompute, static preview
+2026-05-26 — phase-5-renderer — PR #5 — DPR canvas renderer, 4 static states, AsciiCanvas replaces preview
