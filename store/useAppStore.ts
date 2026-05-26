@@ -6,6 +6,15 @@ import {
   EngineWorkerAbortedError,
   computeCellModelInWorker,
 } from "@/lib/engine/client";
+import {
+  cellModelToStateText,
+  exportStatePng,
+  statePngFilename,
+  stateTextBlob,
+  stateTextFilename,
+  triggerDownload,
+} from "@/lib/export";
+import { isAsciiState } from "@/lib/render/states";
 import { prepareImageUpload } from "@/lib/upload/prepare";
 import { UploadValidationError } from "@/lib/upload/validate";
 
@@ -16,8 +25,6 @@ import {
   type AppStore,
   type CanonicalState,
 } from "./types";
-
-const noop = () => undefined;
 
 function beginPlayback(
   set: (partial: Partial<AppStore>) => void,
@@ -43,6 +50,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   playbackStatus: "idle",
   playbackEpoch: 0,
   uploadError: null,
+  exportBackground: "white",
 
   setCurrentState: (state: CanonicalState) =>
     set({ currentState: state, playbackStatus: "idle" }),
@@ -92,5 +100,37 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   clearUploadError: () => set({ uploadError: null }),
 
-  downloadState: noop,
+  setExportBackground: (exportBackground) => set({ exportBackground }),
+
+  downloadState: () => {
+    const { cellModel, currentState, sourceImage, exportBackground } = get();
+    const hasContent =
+      cellModel !== null ||
+      (currentState === "real" && sourceImage !== null);
+    if (!hasContent) {
+      return;
+    }
+
+    void (async () => {
+      try {
+        const pngBlob = await exportStatePng({
+          cellModel,
+          state: currentState,
+          sourceImage,
+          background: exportBackground,
+        });
+        triggerDownload(pngBlob, statePngFilename(currentState));
+
+        if (cellModel && isAsciiState(currentState)) {
+          const text = cellModelToStateText(cellModel, currentState);
+          triggerDownload(
+            stateTextBlob(text),
+            stateTextFilename(currentState),
+          );
+        }
+      } catch {
+        // Export failures are rare (e.g. canvas unavailable); ignore quietly.
+      }
+    })();
+  },
 }));
