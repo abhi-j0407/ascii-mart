@@ -3,8 +3,18 @@
 import { useState } from "react";
 
 import { openUploadPicker } from "@/lib/upload/picker";
+import type { ExportBackground } from "@/store/types";
 import { CANONICAL_STATES } from "@/store/types";
 import { useAppStore } from "@/store/useAppStore";
+
+const EXPORT_BACKGROUNDS: readonly {
+  value: ExportBackground;
+  label: string;
+}[] = [
+  { value: "white", label: "White" },
+  { value: "black", label: "Black" },
+  { value: "transparent", label: "Clear" },
+] as const;
 
 const DENSITY_MIN = 80;
 const DENSITY_MAX = 240;
@@ -26,10 +36,19 @@ export function ControlBar() {
   const replay = useAppStore((state) => state.replay);
   const playbackStatus = useAppStore((state) => state.playbackStatus);
   const downloadState = useAppStore((state) => state.downloadState);
+  const exportBackground = useAppStore((state) => state.exportBackground);
+  const setExportBackground = useAppStore(
+    (state) => state.setExportBackground,
+  );
 
   const canReplay =
     cellModel !== null &&
     sourceImage !== null &&
+    playbackStatus !== "processing";
+
+  const canDownload =
+    (cellModel !== null ||
+      (currentState === "real" && sourceImage !== null)) &&
     playbackStatus !== "processing";
 
   const controls = (
@@ -109,10 +128,33 @@ export function ControlBar() {
         Replay
       </button>
 
+      <fieldset className="flex shrink-0 items-center gap-1 rounded-md border border-neutral-200 bg-white p-1">
+        <legend className="sr-only">PNG background</legend>
+        {EXPORT_BACKGROUNDS.map(({ value, label }) => {
+          const selected = exportBackground === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => setExportBackground(value)}
+              className={`rounded px-2 py-1.5 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-400 ${
+                selected
+                  ? "bg-neutral-900 text-white"
+                  : "text-neutral-600 hover:bg-neutral-100"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </fieldset>
+
       <button
         type="button"
         onClick={downloadState}
-        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-neutral-900 px-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400"
+        disabled={!canDownload}
+        className="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-neutral-900 px-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Download
       </button>
