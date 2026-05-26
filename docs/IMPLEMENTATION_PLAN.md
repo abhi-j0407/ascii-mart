@@ -248,7 +248,7 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 - [x] Phase 5 — Canvas renderer + 4 static states
 - [x] Phase 6 — Animation engine
 - [x] Phase 7 — Export
-- [ ] Phase 8 — Auto-demo, responsive, perf safeguards & UI polish
+- [x] Phase 8 — Auto-demo, responsive, perf safeguards & UI polish
 - [ ] Phase 9 — Deploy & QA
 
 ---
@@ -264,3 +264,4 @@ Animated GIF/MP4/WebM export · shareable links · accounts/history · edge-over
 2026-05-26 — phase-5-renderer — PR #5 — DPR canvas renderer, 4 static states, AsciiCanvas replaces preview
 2026-05-26 — phase-6-animation — PR #6 — rAF timeline, seeded reveals, auto-play/replay/speed, scrub to static
 2026-05-26 — phase-7-export — PR #7 — High-DPI PNG + .txt export, background toggle, downloadState wired
+2026-05-26 — phase-8-polish — PR #8 — Macaw demo auto-play, perf guards, adaptive density, UI polish
