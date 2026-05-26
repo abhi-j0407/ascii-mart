@@ -38,7 +38,7 @@ These were resolved up front. **Do not re-litigate them** without an explicit in
 | 12 | Aesthetic | **Clean, light, neutral, gallery-like.** Art framed center. Use the `impeccable` skill for UI craft in Phase 8. |
 | 13 | State mgmt / render | **Zustand** for state; **Canvas 2D + `requestAnimationFrame`** for rendering (compute is one-time per image/density, so WebGL is deliberately avoided). |
 
-**Demo image:** a royalty-free, high-structure, colorful subject with strong edges and varied color (e.g. a **macaw/parrot portrait** or a **hot-air-balloon** shot) from **Unsplash** (free license, no attribution required). The implementor downloads it into `public/demo/` during Phase 8 and records the exact source URL + photographer here.
+**Demo image:** `public/demo/macaw.jpg` — [Colorful macaw portrait](https://unsplash.com/photos/a-colorful-macaw-looks-directly-at-the-camera-ZySAv7WS6vI) on Unsplash (Unsplash License). Image ID `photo-1743228732896`; photographer credit on the [photo page](https://unsplash.com/photos/a-colorful-macaw-looks-directly-at-the-camera-ZySAv7WS6vI).
 
 ---
 

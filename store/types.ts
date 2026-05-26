@@ -27,6 +27,7 @@ export interface AppActions {
   setSpeed: (speed: number) => void;
   replay: () => void;
   processFile: (file: File) => Promise<void>;
+  bootstrapDemo: () => Promise<void>;
   clearUploadError: () => void;
   setExportBackground: (background: ExportBackground) => void;
   downloadState: () => void;

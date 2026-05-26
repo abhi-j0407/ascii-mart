@@ -18,6 +18,13 @@ import { isAsciiState } from "@/lib/render/states";
 import { prepareImageUpload } from "@/lib/upload/prepare";
 import { UploadValidationError } from "@/lib/upload/validate";
 
+import { loadDemoImage } from "@/lib/demo/loadDemo";
+import { getAdaptiveDefaultDensity } from "@/lib/device/adaptiveDensity";
+import {
+  cancelDensityRecompute,
+  scheduleDensityRecompute,
+} from "@/lib/perf/debounceDensity";
+
 import { recomputeCellModel } from "./computeCellModel";
 import {
   DEFAULT_DENSITY,
@@ -25,6 +32,12 @@ import {
   type AppStore,
   type CanonicalState,
 } from "./types";
+
+function initialDensity(): number {
+  return typeof window !== "undefined"
+    ? getAdaptiveDefaultDensity()
+    : DEFAULT_DENSITY;
+}
 
 function beginPlayback(
   set: (partial: Partial<AppStore>) => void,
@@ -45,7 +58,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   sourceImage: null,
   cellModel: null,
   currentState: "dot-grid",
-  density: DEFAULT_DENSITY,
+  density: initialDensity(),
   speed: DEFAULT_SPEED,
   playbackStatus: "idle",
   playbackEpoch: 0,
@@ -57,7 +70,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   setDensity: (density: number) => {
     set({ density });
-    void recomputeCellModel(get, set);
+    scheduleDensityRecompute(() => void recomputeCellModel(get, set));
   },
 
   setSpeed: (speed: number) => set({ speed }),
@@ -69,9 +82,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ playbackStatus: "processing", uploadError: null });
 
     try {
-      const { sourceImage, imageData } = await prepareImageUpload(file, density);
+      cancelDensityRecompute();
+      const { sourceImage, imageData, computeDensity } =
+        await prepareImageUpload(file, density);
       set({ sourceImage });
-      const cellModel = await computeCellModelInWorker(imageData, { density });
+      const cellModel = await computeCellModelInWorker(imageData, {
+        density: computeDensity,
+      });
       set({
         cellModel,
         uploadError: null,
@@ -99,6 +116,43 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   clearUploadError: () => set({ uploadError: null }),
+
+  bootstrapDemo: async () => {
+    if (get().cellModel !== null || get().sourceImage !== null) {
+      return;
+    }
+
+    const density = get().density;
+    set({ playbackStatus: "processing", uploadError: null });
+
+    try {
+      const { sourceImage, imageData, computeDensity } =
+        await loadDemoImage(density);
+      set({ sourceImage });
+      const cellModel = await computeCellModelInWorker(imageData, {
+        density: computeDensity,
+      });
+      set({
+        cellModel,
+        uploadError: null,
+        currentState: "dot-grid",
+        playbackStatus: "playing",
+        playbackEpoch: get().playbackEpoch + 1,
+      });
+    } catch (error) {
+      if (error instanceof EngineWorkerAbortedError) {
+        return;
+      }
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Could not load the demo image.";
+      set({
+        playbackStatus: "idle",
+        uploadError: message,
+      });
+    }
+  },
 
   setExportBackground: (exportBackground) => set({ exportBackground }),
 
