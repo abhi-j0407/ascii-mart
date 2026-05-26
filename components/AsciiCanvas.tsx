@@ -2,10 +2,42 @@
 
 import { useEffect, useRef } from "react";
 
-import { drawStaticPreview } from "@/lib/render/drawStaticPreview";
+import { renderFrame } from "@/lib/render/canvasRenderer";
 import { useAppStore } from "@/store/useAppStore";
 
-export function CanvasPlaceholder() {
+function drawEmptyPlaceholder(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+): void {
+  context.clearRect(0, 0, width, height);
+  context.fillStyle = "#fafafa";
+  context.fillRect(0, 0, width, height);
+
+  context.strokeStyle = "#e5e5e5";
+  context.lineWidth = 1;
+  const step = 24;
+  for (let x = 0; x <= width; x += step) {
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, height);
+    context.stroke();
+  }
+  for (let y = 0; y <= height; y += step) {
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+
+  context.fillStyle = "#a3a3a3";
+  context.font = "13px var(--font-geist-sans, system-ui, sans-serif)";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText("Upload an image to begin", width / 2, height / 2);
+}
+
+export function AsciiCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const cellModel = useAppStore((state) => state.cellModel);
@@ -33,43 +65,20 @@ export function CanvasPlaceholder() {
 
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      if (cellModel) {
-        drawStaticPreview(
-          context,
-          rect.width,
-          rect.height,
+      const viewport = { width: rect.width, height: rect.height };
+      const hasContent =
+        cellModel !== null || (currentState === "real" && sourceImage !== null);
+
+      if (hasContent) {
+        renderFrame(context, viewport, {
           cellModel,
-          currentState,
+          state: currentState,
           sourceImage,
-        );
+        });
         return;
       }
 
-      context.clearRect(0, 0, rect.width, rect.height);
-      context.fillStyle = "#fafafa";
-      context.fillRect(0, 0, rect.width, rect.height);
-
-      context.strokeStyle = "#e5e5e5";
-      context.lineWidth = 1;
-      const step = 24;
-      for (let x = 0; x <= rect.width; x += step) {
-        context.beginPath();
-        context.moveTo(x, 0);
-        context.lineTo(x, rect.height);
-        context.stroke();
-      }
-      for (let y = 0; y <= rect.height; y += step) {
-        context.beginPath();
-        context.moveTo(0, y);
-        context.lineTo(rect.width, y);
-        context.stroke();
-      }
-
-      context.fillStyle = "#a3a3a3";
-      context.font = "13px var(--font-geist-sans, system-ui, sans-serif)";
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText("Upload an image to begin", rect.width / 2, rect.height / 2);
+      drawEmptyPlaceholder(context, rect.width, rect.height);
     };
 
     draw();

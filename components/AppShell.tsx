@@ -1,6 +1,6 @@
 "use client";
 
-import { CanvasPlaceholder } from "@/components/CanvasPlaceholder";
+import { AsciiCanvas } from "@/components/AsciiCanvas";
 import { ControlBar } from "@/components/ControlBar";
 import { UploadTarget } from "@/components/UploadTarget";
 
@@ -12,7 +12,7 @@ export function AppShell() {
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <UploadTarget>
               <div className="relative aspect-[4/3] w-full max-h-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm ring-1 ring-black/5">
-                <CanvasPlaceholder />
+                <AsciiCanvas />
               </div>
             </UploadTarget>
           </div>
