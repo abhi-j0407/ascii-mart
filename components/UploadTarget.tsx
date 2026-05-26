@@ -110,16 +110,18 @@ export function UploadTarget({ children }: UploadTargetProps) {
 
       {dragActive ? (
         <div
-          className="pointer-events-none absolute inset-3 z-10 flex items-center justify-center rounded-md border-2 border-dashed border-neutral-400 bg-white/90"
+          className="pointer-events-none absolute inset-3 z-10 flex items-center justify-center rounded-lg border-2 border-dashed border-neutral-400 bg-white/92 backdrop-blur-sm motion-safe:transition-opacity"
           aria-hidden
         >
-          <p className="text-sm font-medium text-neutral-700">Drop image to upload</p>
+          <p className="text-sm font-medium text-neutral-800">
+            Drop image to upload
+          </p>
         </div>
       ) : null}
 
       {uploadError ? (
         <div
-          className="absolute bottom-3 left-3 right-3 z-10 flex items-start justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 shadow-sm"
+          className="absolute bottom-3 left-3 right-3 z-10 flex items-start justify-between gap-3 rounded-lg border border-red-200/90 bg-red-50 px-3 py-2.5 text-sm text-red-900 shadow-sm"
           role="alert"
         >
           <p>{uploadError}</p>

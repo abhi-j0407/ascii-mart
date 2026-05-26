@@ -15,12 +15,13 @@ function drawEmptyPlaceholder(
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
+  message: string,
 ): void {
   context.clearRect(0, 0, width, height);
-  context.fillStyle = "#fafafa";
+  context.fillStyle = "#fafaf9";
   context.fillRect(0, 0, width, height);
 
-  context.strokeStyle = "#e5e5e5";
+  context.strokeStyle = "#e7e5e4";
   context.lineWidth = 1;
   const step = 24;
   for (let x = 0; x <= width; x += step) {
@@ -36,11 +37,11 @@ function drawEmptyPlaceholder(
     context.stroke();
   }
 
-  context.fillStyle = "#a3a3a3";
+  context.fillStyle = "#78716c";
   context.font = "13px var(--font-geist-sans, system-ui, sans-serif)";
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillText("Upload an image to begin", width / 2, height / 2);
+  context.fillText(message, width / 2, height / 2);
 }
 
 export function AsciiCanvas() {
@@ -52,6 +53,11 @@ export function AsciiCanvas() {
   const sourceImage = useAppStore((state) => state.sourceImage);
   const playbackStatus = useAppStore((state) => state.playbackStatus);
   const playbackEpoch = useAppStore((state) => state.playbackEpoch);
+
+  const emptyMessage =
+    playbackStatus === "processing" && !cellModel && !sourceImage
+      ? "Loading demo…"
+      : "Drop, paste, or upload an image";
 
   useEffect(() => {
     ordersRef.current = cellModel ? buildCellRevealOrders(cellModel) : null;
@@ -86,7 +92,12 @@ export function AsciiCanvas() {
         cellModel !== null || (currentState === "real" && sourceImage !== null);
 
       if (!hasContent) {
-        drawEmptyPlaceholder(context, viewport.width, viewport.height);
+        drawEmptyPlaceholder(
+          context,
+          viewport.width,
+          viewport.height,
+          emptyMessage,
+        );
         return;
       }
 
@@ -175,6 +186,7 @@ export function AsciiCanvas() {
     sourceImage,
     playbackStatus,
     playbackEpoch,
+    emptyMessage,
   ]);
 
   const processing = playbackStatus === "processing";
@@ -186,14 +198,14 @@ export function AsciiCanvas() {
         aria-label="ASCII canvas preview"
         className="h-full w-full rounded-sm bg-neutral-50"
       />
-      {processing ? (
+      {processing && (cellModel !== null || sourceImage !== null) ? (
         <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/70"
+          className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/75 backdrop-blur-[2px] motion-safe:transition-opacity"
           role="status"
           aria-live="polite"
         >
-          <p className="rounded-md border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-800 shadow-sm">
-            Processing…
+          <p className="rounded-lg border border-neutral-200/90 bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 shadow-sm">
+            Rebuilding…
           </p>
         </div>
       ) : null}
